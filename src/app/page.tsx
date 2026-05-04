@@ -52,14 +52,13 @@ export default function DashboardPage() {
 
   const handleUpdateStatus = async (id: number) => {
     try {
-      const response = await apiFetch(`/barang/${id}`, {
+      const response = await apiFetch(`/barang/${id}/status`, {
         method: 'PATCH',
-        body: JSON.stringify({ status: 'sudah_diambil' }),
       });
 
       if (response.ok) {
         // Optimistic update
-        setItems(items.map(item => 
+        setItems(items.map(item =>
           item.id === id ? { ...item, status: 'sudah_diambil' as const } : item
         ));
       }
@@ -73,7 +72,7 @@ export default function DashboardPage() {
     router.push('/login');
   };
 
-  const filteredItems = items.filter(item => 
+  const filteredItems = items.filter(item =>
     item.deskripsi.toLowerCase().includes(searchTerm.toLowerCase()) ||
     item.kategori?.nama_kategori.toLowerCase().includes(searchTerm.toLowerCase()) ||
     item.laboratorium?.nama_lab.toLowerCase().includes(searchTerm.toLowerCase())
@@ -91,7 +90,7 @@ export default function DashboardPage() {
           <p className="text-xs text-gray-500">Lost & Found Dashboard</p>
         </motion.div>
         <div className="flex items-center gap-3">
-          <button 
+          <button
             onClick={handleLogout}
             className="p-2 text-gray-400 hover:text-red-500 transition-colors"
           >
@@ -127,7 +126,7 @@ export default function DashboardPage() {
             <p>Memuat data barang...</p>
           </div>
         ) : filteredItems.length === 0 ? (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             className="flex flex-col items-center justify-center py-20 text-gray-400 space-y-3"
@@ -139,7 +138,7 @@ export default function DashboardPage() {
           <div className="space-y-4">
             <AnimatePresence mode="popLayout">
               {filteredItems.map((item, index) => (
-                <motion.div 
+                <motion.div
                   key={item.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -149,10 +148,10 @@ export default function DashboardPage() {
                 >
                   <div className="w-24 h-24 bg-gray-100 rounded-md overflow-hidden flex-shrink-0 flex items-center justify-center relative">
                     {item.foto_url ? (
-                      <img 
-                        src={`${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '')}${item.foto_url}`} 
-                        alt={item.deskripsi} 
-                        className="w-full h-full object-cover" 
+                      <img
+                        src={`${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '')}${item.foto_url}`}
+                        alt={item.deskripsi}
+                        className="w-full h-full object-cover"
                       />
                     ) : (
                       <Package className="text-gray-300" size={32} />
@@ -167,20 +166,19 @@ export default function DashboardPage() {
                           </h3>
                           <p className="text-xs text-gray-500 mt-1 line-clamp-1">{item.deskripsi}</p>
                         </div>
-                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold uppercase ${
-                          item.status === 'sudah_diambil' 
-                            ? 'bg-green-100 text-green-700' 
-                            : 'bg-yellow-100 text-yellow-700'
-                        }`}>
+                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold uppercase ${item.status === 'sudah_diambil'
+                          ? 'bg-green-100 text-green-700'
+                          : 'bg-yellow-100 text-yellow-700'
+                          }`}>
                           {item.status === 'sudah_diambil' ? 'Diambil' : 'Belum'}
                         </span>
                       </div>
-                      
+
                       <div className="mt-2 space-y-1">
                         <div className="flex items-center text-xs text-gray-500">
                           <MapPin size={12} className="mr-1" />
-                          {item.sumber_lokasi === 'laboratorium' 
-                            ? `Lab: ${item.laboratorium?.nama_lab}` 
+                          {item.sumber_lokasi === 'laboratorium'
+                            ? `Lab: ${item.laboratorium?.nama_lab}`
                             : item.sumber_lokasi.charAt(0).toUpperCase() + item.sumber_lokasi.slice(1)}
                         </div>
                         <div className="flex items-center text-xs text-gray-500 font-medium text-primary">
@@ -189,9 +187,9 @@ export default function DashboardPage() {
                         </div>
                         <div className="flex items-center text-xs text-gray-500">
                           <Calendar size={12} className="mr-1" />
-                          {new Date(item.tanggal_waktu).toLocaleDateString('id-ID', { 
-                            day: 'numeric', 
-                            month: 'short', 
+                          {new Date(item.tanggal_waktu).toLocaleDateString('id-ID', {
+                            day: 'numeric',
+                            month: 'short',
                             year: 'numeric',
                             hour: '2-digit',
                             minute: '2-digit'
