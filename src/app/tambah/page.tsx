@@ -90,29 +90,24 @@ export default function TambahBarangPage() {
     setError('');
 
     const formData = new FormData();
-    formData.append('nama', nama);
-    formData.append('deskripsi', deskripsi);
+
+    // Selalu kirim sumber_lokasi (sekarang sudah pakai underscore: cleaning_service)
+    formData.append('sumber_lokasi', source);
     formData.append('kategori_id', kategoriId);
-    if (source === 'laboratorium') {
-      formData.append('sumber_lokasi', source);
-      if (labId) formData.append('lab_id', labId);
+
+    // Kirim lab_id hanya jika sumbernya dari laboratorium
+    if (source === 'laboratorium' && labId) {
+      formData.append('lab_id', labId);
     }
+
+    // Gabungkan nama dan lokasi penemuan ke deskripsi agar tersimpan di backend
+    const gabungDeskripsi = `Barang: ${nama}\nLokasi Temuan: ${lokasiLain}\n\nDeskripsi: ${deskripsi}`;
+    formData.append('deskripsi', gabungDeskripsi);
 
     formData.append('lokasi_id', storageId);
     formData.append('detail_penyimpanan', detailPenyimpanan);
     formData.append('tanggal_waktu', new Date().toISOString().slice(0, 19).replace('T', ' '));
 
-    // Keeping this for backward compatibility if backend still uses it, or UI needs it
-    let displayLokasi = '';
-    if (source === 'laboratorium') {
-      const labName = labs.find(l => l.id === Number(labId))?.nama_lab;
-      displayLokasi = `Lab: ${labName}${lokasiLain ? ` (${lokasiLain})` : ''}`;
-    } else if (source === 'cleaning_service') {
-      displayLokasi = lokasiLain;
-    } else {
-      displayLokasi = lokasiLain;
-    }
-    formData.append('lokasi', lokasiLain);
     if (image) {
       formData.append('foto', image);
     }
@@ -232,20 +227,6 @@ export default function TambahBarangPage() {
               onChange={handleImageChange}
             />
           </motion.div>
-        </div>
-
-        {/* Name */}
-        <div className="space-y-2">
-          <label htmlFor="nama" className="block text-sm font-semibold text-gray-700">Nama Barang</label>
-          <input
-            id="nama"
-            type="text"
-            required
-            className="input-field"
-            placeholder="Contoh: Kunci Motor, Jaket"
-            value={nama}
-            onChange={(e) => setNama(e.target.value)}
-          />
         </div>
 
         {/* Category */}
