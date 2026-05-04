@@ -5,8 +5,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Lost & Found Tracker",
-  description: "Corporate Academic Lost & Found Mobile Tracker",
+  title: "MyPatroli",
+  description: "Catat kehilangan barang di Laboratorium Lt 2",
 };
 
 export default function RootLayout({

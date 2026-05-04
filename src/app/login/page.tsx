@@ -49,7 +49,7 @@ export default function LoginPage() {
             <LogIn size={32} />
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-gray-900">
-            Lost & Found Tracker
+            MyPatroli
           </h1>
           <p className="mt-2 text-sm text-gray-600">
             Sign in to access the dashboard
@@ -60,7 +60,7 @@ export default function LoginPage() {
           <div className="space-y-4">
             <div>
               <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-                Email address
+                Username
               </label>
               <input
                 id="username"
