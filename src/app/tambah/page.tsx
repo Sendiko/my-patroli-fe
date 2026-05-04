@@ -93,15 +93,12 @@ export default function TambahBarangPage() {
     formData.append('nama', nama);
     formData.append('deskripsi', deskripsi);
     formData.append('kategori_id', kategoriId);
-    formData.append('sumber_lokasi', source);
-    if (source === 'laboratorium' && labId) {
-      formData.append('lab_id', labId);
-    }
-
     if (source === 'laboratorium') {
-      formData.append('lokasi_id', storageId);
+      formData.append('sumber_lokasi', source);
+      if (labId) formData.append('lab_id', labId);
     }
 
+    formData.append('lokasi_id', storageId);
     formData.append('detail_penyimpanan', detailPenyimpanan);
     formData.append('tanggal_waktu', new Date().toISOString().slice(0, 19).replace('T', ' '));
 
@@ -354,49 +351,40 @@ export default function TambahBarangPage() {
           />
         </div>
 
-        {/* Storage Information - Only for Laboratorium source */}
-        <AnimatePresence mode="wait">
-          {source === 'laboratorium' && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="border-t border-gray-100 pt-6 space-y-6 overflow-hidden"
+        {/* Storage Information */}
+        <div className="border-t border-gray-100 pt-6 space-y-6">
+          <h2 className="text-sm font-bold text-gray-400 uppercase tracking-wider">Informasi Penyimpanan</h2>
+
+          {/* Storage Location */}
+          <div className="space-y-2">
+            <label htmlFor="storage" className="block text-sm font-semibold text-gray-700">Lokasi Penyimpanan</label>
+            <select
+              id="storage"
+              required
+              className="input-field"
+              value={storageId}
+              onChange={(e) => setStorageId(e.target.value)}
             >
-              <h2 className="text-sm font-bold text-gray-400 uppercase tracking-wider">Informasi Penyimpanan</h2>
+              <option value="">Pilih Lokasi Simpan...</option>
+              {storageLocations.map((loc) => (
+                <option key={loc.id} value={loc.id}>{loc.nama_lokasi}</option>
+              ))}
+            </select>
+          </div>
 
-              {/* Storage Location */}
-              <div className="space-y-2">
-                <label htmlFor="storage" className="block text-sm font-semibold text-gray-700">Lokasi Penyimpanan</label>
-                <select
-                  id="storage"
-                  required
-                  className="input-field"
-                  value={storageId}
-                  onChange={(e) => setStorageId(e.target.value)}
-                >
-                  <option value="">Pilih Lokasi Simpan...</option>
-                  {storageLocations.map((loc) => (
-                    <option key={loc.id} value={loc.id}>{loc.nama_lokasi}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Storage Detail */}
-              <div className="space-y-2">
-                <label htmlFor="storage-detail" className="block text-sm font-semibold text-gray-700">Detail Penyimpanan</label>
-                <textarea
-                  id="storage-detail"
-                  rows={2}
-                  className="input-field"
-                  placeholder="Contoh: Lemari A, Laci Meja, dsb."
-                  value={detailPenyimpanan}
-                  onChange={(e) => setDetailPenyimpanan(e.target.value)}
-                />
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+          {/* Storage Detail */}
+          <div className="space-y-2">
+            <label htmlFor="storage-detail" className="block text-sm font-semibold text-gray-700">Detail Penyimpanan</label>
+            <textarea
+              id="storage-detail"
+              rows={2}
+              className="input-field"
+              placeholder="Contoh: Lemari A, Laci Meja, dsb."
+              value={detailPenyimpanan}
+              onChange={(e) => setDetailPenyimpanan(e.target.value)}
+            />
+          </div>
+        </div>
 
         {/* Description */}
         <div className="space-y-2">
