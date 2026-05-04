@@ -6,8 +6,6 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'mypatroli.sendiko.my.id',
-        port: '',
-        pathname: '/uploads/**',
       },
     ],
   },
