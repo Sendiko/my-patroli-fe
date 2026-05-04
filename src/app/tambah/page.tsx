@@ -26,7 +26,7 @@ interface StorageLocation {
 export default function TambahBarangPage() {
   const [nama, setNama] = useState('');
   const [deskripsi, setDeskripsi] = useState('');
-  const [source, setSource] = useState<'laboratorium' | 'cleaning service' | 'mahasiswa'>('laboratorium');
+  const [source, setSource] = useState<'laboratorium' | 'cleaning_service' | 'mahasiswa'>('laboratorium');
   const [labId, setLabId] = useState('');
   const [lokasiLain, setLokasiLain] = useState('');
   const [image, setImage] = useState<File | null>(null);
@@ -107,7 +107,7 @@ export default function TambahBarangPage() {
     if (source === 'laboratorium') {
       const labName = labs.find(l => l.id === Number(labId))?.nama_lab;
       displayLokasi = `Lab: ${labName}${lokasiLain ? ` (${lokasiLain})` : ''}`;
-    } else if (source === 'cleaning service') {
+    } else if (source === 'cleaning_service') {
       displayLokasi = lokasiLain;
     } else {
       displayLokasi = lokasiLain;
@@ -287,8 +287,8 @@ export default function TambahBarangPage() {
                 type="radio"
                 name="source"
                 className="w-5 h-5 accent-primary"
-                checked={source === 'cleaning service'}
-                onChange={() => setSource('cleaning service')}
+                checked={source === 'cleaning_service'}
+                onChange={() => setSource('cleaning_service')}
               />
               <div className="flex flex-col">
                 <span className="font-bold text-gray-900">Temuan Cleaning Service</span>
