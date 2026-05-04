@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 interface Lab {
   id: number;
+  kode_lab: string;
   nama_lab: string;
 }
 
@@ -329,7 +330,7 @@ export default function TambahBarangPage() {
               >
                 <option value="">Pilih Lab...</option>
                 {labs.map((lab) => (
-                  <option key={lab.id} value={lab.id}>{lab.nama_lab}</option>
+                  <option key={lab.id} value={lab.id}><b>{lab.kode_lab}</b> - {lab.nama_lab}</option>
                 ))}
               </select>
             </motion.div>
