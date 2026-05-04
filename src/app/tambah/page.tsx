@@ -108,11 +108,11 @@ export default function TambahBarangPage() {
       const labName = labs.find(l => l.id === Number(labId))?.nama_lab;
       displayLokasi = `Lab: ${labName}${lokasiLain ? ` (${lokasiLain})` : ''}`;
     } else if (source === 'cleaning service') {
-      displayLokasi = `Cleaning Service: ${lokasiLain}`;
+      displayLokasi = lokasiLain;
     } else {
-      displayLokasi = `Mahasiswa: ${lokasiLain}`;
+      displayLokasi = lokasiLain;
     }
-    formData.append('lokasi', displayLokasi);
+    formData.append('lokasi', lokasiLain);
     if (image) {
       formData.append('foto', image);
     }
