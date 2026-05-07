@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { apiFetch } from '@/lib/api';
-import { Plus, Package, MapPin, Calendar, CheckCircle, Search, LogOut } from 'lucide-react';
+import { Plus, Package, MapPin, Calendar, Search, LogOut, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
@@ -138,13 +138,17 @@ export default function DashboardPage() {
           <div className="space-y-4">
             <AnimatePresence mode="popLayout">
               {filteredItems.map((item, index) => (
-                <motion.div
+                <Link
                   key={item.id}
+                  href={`/barang/${item.id}`}
+                  className="block"
+                >
+                <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ delay: index * 0.05 }}
-                  className="card flex gap-4"
+                  className="card flex gap-4 hover:shadow-md hover:border-primary/20 transition-all active:scale-[0.99] cursor-pointer"
                 >
                   <div className="w-24 h-24 bg-gray-100 rounded-md overflow-hidden flex-shrink-0 flex items-center justify-center relative">
                     {item.foto_url ? (
@@ -160,18 +164,21 @@ export default function DashboardPage() {
                   <div className="flex-1 flex flex-col justify-between py-1">
                     <div>
                       <div className="flex justify-between items-start">
-                        <div className="flex flex-col">
+                        <div className="flex flex-col flex-1 min-w-0">
                           <h3 className="font-bold text-gray-900 leading-tight">
                             {item.kategori?.nama_kategori || 'Tanpa Kategori'}
                           </h3>
                           <p className="text-xs text-gray-500 mt-1 line-clamp-1">{item.deskripsi}</p>
                         </div>
-                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold uppercase ${item.status === 'sudah_diambil'
-                          ? 'bg-green-100 text-green-700'
-                          : 'bg-yellow-100 text-yellow-700'
-                          }`}>
-                          {item.status === 'sudah_diambil' ? 'Diambil' : 'Belum'}
-                        </span>
+                        <div className="flex items-center gap-1 ml-2">
+                          <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold uppercase ${item.status === 'sudah_diambil'
+                            ? 'bg-green-100 text-green-700'
+                            : 'bg-yellow-100 text-yellow-700'
+                            }`}>
+                            {item.status === 'sudah_diambil' ? 'Diambil' : 'Belum'}
+                          </span>
+                          <ChevronRight size={16} className="text-gray-300 flex-shrink-0" />
+                        </div>
                       </div>
 
                       <div className="mt-2 space-y-1">
@@ -198,19 +205,10 @@ export default function DashboardPage() {
                       </div>
                     </div>
 
-                    {item.status === 'belum_diambil' && (
-                      <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => handleUpdateStatus(item.id)}
-                        className="mt-3 flex items-center justify-center gap-1.5 py-1.5 px-3 bg-green-50 text-green-700 text-xs font-bold rounded border border-green-200 hover:bg-green-100 transition-colors w-fit"
-                      >
-                        <CheckCircle size={14} />
-                        Telah Diambil
-                      </motion.button>
-                    )}
+
                   </div>
                 </motion.div>
+                </Link>
               ))}
             </AnimatePresence>
           </div>

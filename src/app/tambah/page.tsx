@@ -26,7 +26,7 @@ interface StorageLocation {
 export default function TambahBarangPage() {
   const [nama, setNama] = useState('');
   const [deskripsi, setDeskripsi] = useState('');
-  const [source, setSource] = useState<'laboratorium' | 'cleaning_service' | 'mahasiswa'>('laboratorium');
+  const [source, setSource] = useState<'asisten_laboratorium' | 'cleaning_service' | 'mahasiswa'>('asisten_laboratorium');
   const [labId, setLabId] = useState('');
   const [lokasiLain, setLokasiLain] = useState('');
   const [image, setImage] = useState<File | null>(null);
@@ -91,12 +91,10 @@ export default function TambahBarangPage() {
 
     const formData = new FormData();
 
-    // Selalu kirim sumber_lokasi (sekarang sudah pakai underscore: cleaning_service)
-    formData.append('sumber_lokasi', source);
+    formData.append('ditemukan_oleh', source);
     formData.append('kategori_id', kategoriId);
 
-    // Kirim lab_id hanya jika sumbernya dari laboratorium
-    if (source === 'laboratorium' && labId) {
+    if (labId) {
       formData.append('lab_id', labId);
     }
 
@@ -246,33 +244,35 @@ export default function TambahBarangPage() {
           </select>
         </div>
 
-        {/* Location Source */}
+        {/* Ditemukan Oleh */}
         <div className="space-y-3">
-          <label className="block text-sm font-semibold text-gray-700">Sumber Temuan</label>
+          <label className="block text-sm font-semibold text-gray-700">Ditemukan Oleh</label>
           <div className="grid grid-cols-1 gap-3">
             <label className="flex items-center gap-3 p-4 border rounded-xl cursor-pointer transition-all has-[:checked]:border-primary has-[:checked]:bg-primary/5">
               <input
                 type="radio"
                 name="source"
+                value="asisten_laboratorium"
                 className="w-5 h-5 accent-primary"
-                checked={source === 'laboratorium'}
-                onChange={() => setSource('laboratorium')}
+                checked={source === 'asisten_laboratorium'}
+                onChange={() => setSource('asisten_laboratorium')}
               />
               <div className="flex flex-col">
-                <span className="font-bold text-gray-900">Laboratorium</span>
-                <span className="text-xs text-gray-500">Ditemukan di area laboratorium</span>
+                <span className="font-bold text-gray-900">Asisten Laboratorium</span>
+                <span className="text-xs text-gray-500">Ditemukan oleh asisten laboratorium</span>
               </div>
             </label>
             <label className="flex items-center gap-3 p-4 border rounded-xl cursor-pointer transition-all has-[:checked]:border-primary has-[:checked]:bg-primary/5">
               <input
                 type="radio"
                 name="source"
+                value="cleaning_service"
                 className="w-5 h-5 accent-primary"
                 checked={source === 'cleaning_service'}
                 onChange={() => setSource('cleaning_service')}
               />
               <div className="flex flex-col">
-                <span className="font-bold text-gray-900">Temuan Cleaning Service</span>
+                <span className="font-bold text-gray-900">Cleaning Service</span>
                 <span className="text-xs text-gray-500">Diserahkan oleh petugas kebersihan</span>
               </div>
             </label>
@@ -280,44 +280,35 @@ export default function TambahBarangPage() {
               <input
                 type="radio"
                 name="source"
+                value="mahasiswa"
                 className="w-5 h-5 accent-primary"
                 checked={source === 'mahasiswa'}
                 onChange={() => setSource('mahasiswa')}
               />
               <div className="flex flex-col">
-                <span className="font-bold text-gray-900">Temuan Mahasiswa</span>
+                <span className="font-bold text-gray-900">Mahasiswa</span>
                 <span className="text-xs text-gray-500">Diserahkan oleh mahasiswa</span>
               </div>
             </label>
           </div>
         </div>
 
-        {/* Location Detail */}
-        <AnimatePresence mode="wait">
-          {source === 'laboratorium' && (
-            <motion.div
-              key="lab-select"
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="space-y-2 overflow-hidden"
-            >
-              <label htmlFor="lab" className="block text-sm font-semibold text-gray-700">Pilih Laboratorium</label>
-              <select
-                id="lab"
-                required
-                className="input-field"
-                value={labId}
-                onChange={(e) => setLabId(e.target.value)}
-              >
-                <option value="">Pilih Lab...</option>
-                {labs.map((lab) => (
-                  <option key={lab.id} value={lab.id}><b>{lab.kode_lab}</b> - {lab.nama_lab}</option>
-                ))}
-              </select>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* Pilih Laboratorium - selalu tampil */}
+        <div className="space-y-2">
+          <label htmlFor="lab" className="block text-sm font-semibold text-gray-700">Pilih Laboratorium</label>
+          <select
+            id="lab"
+            required
+            className="input-field"
+            value={labId}
+            onChange={(e) => setLabId(e.target.value)}
+          >
+            <option value="">Pilih Lab...</option>
+            {labs.map((lab) => (
+              <option key={lab.id} value={lab.id}>{lab.kode_lab} - {lab.nama_lab}</option>
+            ))}
+          </select>
+        </div>
 
         <div className="space-y-2">
           <label htmlFor="lokasi" className="block text-sm font-semibold text-gray-700">Detail Lokasi Penemuan</label>
@@ -326,7 +317,7 @@ export default function TambahBarangPage() {
             required
             rows={2}
             className="input-field"
-            placeholder={source === 'laboratorium' ? "Contoh: Di bawah meja nomor 5" : "Contoh: Di kursi depan Gedung C"}
+            placeholder={source === 'asisten_laboratorium' ? "Contoh: Di bawah meja nomor 5" : "Contoh: Di kursi depan Gedung C"}
             value={lokasiLain}
             onChange={(e) => setLokasiLain(e.target.value)}
           />
