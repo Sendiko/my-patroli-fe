@@ -2,7 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { apiFetch } from '@/lib/api';
-import { Plus, Package, MapPin, Calendar, Search, LogOut, ChevronRight } from 'lucide-react';
+import { decodeToken } from '@/lib/auth';
+import {
+  Plus, Package, MapPin, Calendar, Search, LogOut, ChevronRight,
+  Tag, FlaskConical, Archive, Settings
+} from 'lucide-react';
 import Link from 'next/link';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
@@ -31,6 +35,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const router = useRouter();
+  const userInfo = decodeToken();
 
   const fetchItems = async () => {
     try {
@@ -87,7 +92,14 @@ export default function DashboardPage() {
           animate={{ opacity: 1, x: 0 }}
         >
           <h1 className="text-xl font-bold text-primary">Patroli Barang</h1>
-          <p className="text-xs text-gray-500">Lost & Found Dashboard</p>
+          <p className="text-xs text-gray-500">
+            {userInfo?.username || 'Lost & Found Dashboard'}
+            {userInfo?.role && (
+              <span className="ml-1.5 bg-primary/10 text-primary text-[10px] font-semibold px-1.5 py-0.5 rounded-full uppercase">
+                {userInfo.role}
+              </span>
+            )}
+          </p>
         </motion.div>
         <div className="flex items-center gap-3">
           <button
@@ -119,100 +131,145 @@ export default function DashboardPage() {
       </div>
 
       {/* Content */}
-      <main className="flex-1 p-4 overflow-y-auto space-y-4">
-        {loading ? (
-          <div className="flex flex-col items-center justify-center py-20 space-y-4 text-gray-400">
-            <div className="animate-spin text-primary">◌</div>
-            <p>Memuat data barang...</p>
+      <main className="flex-1 overflow-y-auto">
+
+        {/* Management Menu */}
+        <motion.section
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.05 }}
+          className="px-4 pt-4 pb-2"
+        >
+          <div className="flex items-center gap-2 mb-3">
+            <Settings size={14} className="text-gray-400" />
+            <h2 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Pengelolaan</h2>
           </div>
-        ) : filteredItems.length === 0 ? (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="flex flex-col items-center justify-center py-20 text-gray-400 space-y-3"
-          >
-            <Package size={48} strokeWidth={1.5} />
-            <p>Tidak ada barang ditemukan</p>
-          </motion.div>
-        ) : (
-          <div className="space-y-4">
-            <AnimatePresence mode="popLayout">
-              {filteredItems.map((item, index) => (
-                <Link
-                  key={item.id}
-                  href={`/barang/${item.id}`}
-                  className="block"
-                >
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ delay: index * 0.05 }}
-                  className="card flex gap-4 hover:shadow-md hover:border-primary/20 transition-all active:scale-[0.99] cursor-pointer"
-                >
-                  <div className="w-24 h-24 bg-gray-100 rounded-md overflow-hidden flex-shrink-0 flex items-center justify-center relative">
-                    {item.foto_url ? (
-                      <img
-                        src={`${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '')}${item.foto_url}`}
-                        alt={item.deskripsi}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <Package className="text-gray-300" size={32} />
-                    )}
-                  </div>
-                  <div className="flex-1 flex flex-col justify-between py-1">
-                    <div>
-                      <div className="flex justify-between items-start">
-                        <div className="flex flex-col flex-1 min-w-0">
-                          <h3 className="font-bold text-gray-900 leading-tight">
-                            {item.kategori?.nama_kategori || 'Tanpa Kategori'}
-                          </h3>
-                          <p className="text-xs text-gray-500 mt-1 line-clamp-1">{item.deskripsi}</p>
-                        </div>
-                        <div className="flex items-center gap-1 ml-2">
-                          <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold uppercase ${item.status === 'sudah_diambil'
-                            ? 'bg-green-100 text-green-700'
-                            : 'bg-yellow-100 text-yellow-700'
-                            }`}>
-                            {item.status === 'sudah_diambil' ? 'Diambil' : 'Belum'}
-                          </span>
-                          <ChevronRight size={16} className="text-gray-300 flex-shrink-0" />
-                        </div>
-                      </div>
-
-                      <div className="mt-2 space-y-1">
-                        <div className="flex items-center text-xs text-gray-500">
-                          <MapPin size={12} className="mr-1" />
-                          {item.sumber_lokasi === 'laboratorium'
-                            ? `Lab: ${item.laboratorium?.nama_lab}`
-                            : item.sumber_lokasi.charAt(0).toUpperCase() + item.sumber_lokasi.slice(1)}
-                        </div>
-                        <div className="flex items-center text-xs text-gray-500 font-medium text-primary">
-                          <Package size={12} className="mr-1" />
-                          Simpan: {item.lokasiPenyimpanan?.nama_lokasi || '-'}
-                        </div>
-                        <div className="flex items-center text-xs text-gray-500">
-                          <Calendar size={12} className="mr-1" />
-                          {new Date(item.tanggal_waktu).toLocaleDateString('id-ID', {
-                            day: 'numeric',
-                            month: 'short',
-                            year: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}
-                        </div>
-                      </div>
-                    </div>
-
-
-                  </div>
-                </motion.div>
-                </Link>
-              ))}
-            </AnimatePresence>
+          <div className="grid grid-cols-3 gap-3">
+            <Link href="/kelola/kategori" className="flex flex-col items-center gap-2 p-3 bg-white rounded-xl border border-gray-100 shadow-sm hover:border-primary/30 hover:shadow-md transition-all active:scale-95 group">
+              <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center group-hover:bg-blue-100 transition-colors">
+                <Tag size={20} className="text-blue-600" />
+              </div>
+              <span className="text-xs font-semibold text-gray-700 text-center leading-tight">Kategori</span>
+            </Link>
+            <Link href="/kelola/laboratorium" className="flex flex-col items-center gap-2 p-3 bg-white rounded-xl border border-gray-100 shadow-sm hover:border-primary/30 hover:shadow-md transition-all active:scale-95 group">
+              <div className="w-10 h-10 bg-emerald-50 rounded-lg flex items-center justify-center group-hover:bg-emerald-100 transition-colors">
+                <FlaskConical size={20} className="text-emerald-600" />
+              </div>
+              <span className="text-xs font-semibold text-gray-700 text-center leading-tight">Laboratorium</span>
+            </Link>
+            <Link href="/kelola/lokasi" className="flex flex-col items-center gap-2 p-3 bg-white rounded-xl border border-gray-100 shadow-sm hover:border-primary/30 hover:shadow-md transition-all active:scale-95 group">
+              <div className="w-10 h-10 bg-amber-50 rounded-lg flex items-center justify-center group-hover:bg-amber-100 transition-colors">
+                <Archive size={20} className="text-amber-600" />
+              </div>
+              <span className="text-xs font-semibold text-gray-700 text-center leading-tight">Lokasi Simpan</span>
+            </Link>
           </div>
-        )}
+        </motion.section>
+
+        {/* Divider */}
+        <div className="px-4 pt-3 pb-1">
+          <div className="flex items-center gap-2">
+            <Package size={14} className="text-gray-400" />
+            <h2 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Daftar Barang</h2>
+          </div>
+        </div>
+
+        {/* Items */}
+        <div className="p-4 pt-2 space-y-4">
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-20 space-y-4 text-gray-400">
+              <div className="animate-spin text-primary">◌</div>
+              <p>Memuat data barang...</p>
+            </div>
+          ) : filteredItems.length === 0 ? (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="flex flex-col items-center justify-center py-20 text-gray-400 space-y-3"
+            >
+              <Package size={48} strokeWidth={1.5} />
+              <p>Tidak ada barang ditemukan</p>
+            </motion.div>
+          ) : (
+            <div className="space-y-4">
+              <AnimatePresence mode="popLayout">
+                {filteredItems.map((item, index) => (
+                  <Link
+                    key={item.id}
+                    href={`/barang/${item.id}`}
+                    className="block"
+                  >
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      transition={{ delay: index * 0.05 }}
+                      className="card flex gap-4 hover:shadow-md hover:border-primary/20 transition-all active:scale-[0.99] cursor-pointer"
+                    >
+                      <div className="w-24 h-24 bg-gray-100 rounded-md overflow-hidden flex-shrink-0 flex items-center justify-center relative">
+                        {item.foto_url ? (
+                          <img
+                            src={`${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '')}${item.foto_url}`}
+                            alt={item.deskripsi}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <Package className="text-gray-300" size={32} />
+                        )}
+                      </div>
+                      <div className="flex-1 flex flex-col justify-between py-1">
+                        <div>
+                          <div className="flex justify-between items-start">
+                            <div className="flex flex-col flex-1 min-w-0">
+                              <h3 className="font-bold text-gray-900 leading-tight">
+                                {item.kategori?.nama_kategori || 'Tanpa Kategori'}
+                              </h3>
+                              <p className="text-xs text-gray-500 mt-1 line-clamp-1">{item.deskripsi}</p>
+                            </div>
+                            <div className="flex items-center gap-1 ml-2">
+                              <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold uppercase ${item.status === 'sudah_diambil'
+                                ? 'bg-green-100 text-green-700'
+                                : 'bg-yellow-100 text-yellow-700'
+                                }`}>
+                                {item.status === 'sudah_diambil' ? 'Diambil' : 'Belum'}
+                              </span>
+                              <ChevronRight size={16} className="text-gray-300 flex-shrink-0" />
+                            </div>
+                          </div>
+
+                          <div className="mt-2 space-y-1">
+                            <div className="flex items-center text-xs text-gray-500">
+                              <MapPin size={12} className="mr-1" />
+                              {item.sumber_lokasi === 'laboratorium'
+                                ? `Lab: ${item.laboratorium?.nama_lab}`
+                                : item.sumber_lokasi.charAt(0).toUpperCase() + item.sumber_lokasi.slice(1)}
+                            </div>
+                            <div className="flex items-center text-xs text-gray-500 font-medium text-primary">
+                              <Package size={12} className="mr-1" />
+                              Simpan: {item.lokasiPenyimpanan?.nama_lokasi || '-'}
+                            </div>
+                            <div className="flex items-center text-xs text-gray-500">
+                              <Calendar size={12} className="mr-1" />
+                              {new Date(item.tanggal_waktu).toLocaleDateString('id-ID', {
+                                day: 'numeric',
+                                month: 'short',
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}
+                            </div>
+                          </div>
+                        </div>
+
+
+                      </div>
+                    </motion.div>
+                  </Link>
+                ))}
+              </AnimatePresence>
+            </div>
+          )}
+        </div>
       </main>
     </div>
   );
